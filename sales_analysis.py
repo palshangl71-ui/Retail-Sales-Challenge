@@ -1,25 +1,27 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
-# Load the actual CSV dataset
-df = pd.read_csv("Day-2 Challenge.csv")
+# =====================================
+# 1. LOAD DATASET
+# =====================================
 
-# Display the dataset
+folder = os.path.dirname(os.path.abspath(__file__))
+df = pd.read_csv(os.path.join(folder, "Day-2 Challenge.csv"))
+
 print("ORIGINAL DATASET")
 print(df.to_string(index=False))
 
-# Check total records
 print("\nTOTAL RECORDS:", len(df))
-
-# Check columns
 print("\nCOLUMN NAMES:")
 print(df.columns.tolist())
 
-# Check missing values
+# =====================================
+# 2. DATA VALIDATION
+# =====================================
+
 print("\nMISSING VALUES:")
 print(df.isnull().sum())
-
-# DATA VALIDATION
 
 valid_condition = (
     df["OrderID"].notna() &
@@ -43,89 +45,179 @@ print("Valid Records:", len(valid))
 print("Invalid Records:", len(invalid))
 print("Invalid IDs:", invalid["OrderID"].tolist())
 
-# TOTAL REVENUE
+# =====================================
+# 3. SALES CALCULATIONS
+# =====================================
 
-valid["Revenue"] = (
-    valid["Quantity"] * valid["UnitPrice"]
-)
+valid["Revenue"] = valid["Quantity"] * valid["UnitPrice"]
 
 total_revenue = valid["Revenue"].sum()
-
-# TOTAL ORDERS
-
 total_orders = valid["OrderID"].nunique()
-
-# AVERAGE ORDER VALUE
+total_quantity = int(valid["Quantity"].sum())
 
 aov = total_revenue / total_orders if total_orders else 0
 
 print("\nSALES CALCULATIONS")
-
-print("Total Revenue:", total_revenue)
-print("Total Orders:", total_orders)
+print("Total Revenue:", round(total_revenue, 2))
+print("Total Valid Orders:", total_orders)
 print("Average Order Value:", round(aov, 2))
+print("Total Quantity Sold:", total_quantity)
 
-# PRODUCT-WISE REVENUE
+# =====================================
+# 4. PRODUCT-WISE ANALYSIS
+# =====================================
 
 product_revenue = valid.groupby(
     "ProductName"
 )["Revenue"].sum().sort_values(ascending=False)
 
-print("\nPRODUCT-WISE REVENUE")
-print(product_revenue)
-
-print("\nTOP PRODUCT BY REVENUE")
-print(product_revenue.head(1))
-
-# PRODUCT-WISE QUANTITY
-
 product_quantity = valid.groupby(
     "ProductName"
 )["Quantity"].sum().sort_values(ascending=False)
 
+print("\nPRODUCT-WISE REVENUE")
+print(product_revenue)
+
 print("\nPRODUCT-WISE QUANTITY")
 print(product_quantity)
 
-print("\nTOP PRODUCT BY QUANTITY")
+top_product = (
+    product_revenue.idxmax()
+    if not product_revenue.empty else None
+)
 
-print(
-    product_quantity[
-        product_quantity == product_quantity.max()
+top_quantity_product = (
+    product_quantity.idxmax()
+    if not product_quantity.empty else None
+)
+
+print("\nTOP PRODUCT BY REVENUE:", top_product)
+print("TOP PRODUCT BY QUANTITY:", top_quantity_product)
+
+# =====================================
+# 5. REGION-WISE ANALYSIS
+# =====================================
+
+if "Region" in valid.columns:
+    region_revenue = valid.groupby(
+        "Region"
+    )["Revenue"].sum().sort_values(ascending=False)
+
+    top_region = (
+        region_revenue.idxmax()
+        if not region_revenue.empty else None
+    )
+
+    print("\nREGION-WISE REVENUE")
+    print(region_revenue)
+
+    print("\nHIGHEST REVENUE REGION:", top_region)
+
+else:
+    region_revenue = pd.Series(dtype=float)
+    top_region = None
+    print("\nRegion column not found in dataset.")
+
+# =====================================
+# 6. REVENUE CHART
+# =====================================
+
+if not product_revenue.empty:
+    product_revenue.plot(
+        kind="bar",
+        color="skyblue",
+        title="Revenue by Product"
+    )
+
+    plt.xlabel("Product")
+    plt.ylabel("Revenue")
+    plt.tight_layout()
+    plt.savefig(os.path.join(folder, "revenue_chart.png"))
+    plt.show()
+    plt.close()
+
+# =====================================
+# 7. QUANTITY CHART
+# =====================================
+
+if not product_quantity.empty:
+    product_quantity.plot(
+        kind="bar",
+        color="orange",
+        title="Quantity Sold by Product"
+    )
+
+    plt.xlabel("Product")
+    plt.ylabel("Quantity")
+    plt.tight_layout()
+    plt.savefig(os.path.join(folder, "quantity_chart.png"))
+    plt.show()
+    plt.close()
+
+# =====================================
+# 8. CREATE SALES SUMMARY
+# =====================================
+
+sales_summary = pd.DataFrame({
+    "Metric": [
+        "Total Revenue",
+        "Total Valid Orders",
+        "Average Order Value",
+        "Total Quantity Sold",
+        "Top Performing Product",
+        "Highest Revenue Region"
+    ],
+    "Value": [
+        round(total_revenue, 2),
+        total_orders,
+        round(aov, 2),
+        total_quantity,
+        top_product,
+        top_region
     ]
+})
+
+# =====================================
+# 9. CREATE PRODUCT ANALYSIS
+# =====================================
+
+product_analysis = valid.groupby("ProductName").agg(
+    Total_Revenue=("Revenue", "sum"),
+    Total_Quantity=("Quantity", "sum")
+).reset_index()
+
+# =====================================
+# 10. EXPORT CSV FILES
+# =====================================
+
+sales_summary.to_csv(
+    os.path.join(folder, "sales_summary.csv"),
+    index=False
 )
 
-# REVENUE CHART
-
-product_revenue.plot(
-    kind="bar",
-    color="skyblue",
-    title="Revenue by Product"
+product_analysis.to_csv(
+    os.path.join(folder, "product_analysis.csv"),
+    index=False
 )
 
-plt.xlabel("Product")
-plt.ylabel("Revenue")
-plt.tight_layout()
-plt.savefig("revenue_chart.png")
-plt.show()
-
-
-# QUANTITY CHART
-
-product_quantity.plot(
-    kind="bar",
-    color="orange",
-    title="Quantity Sold by Product"
+valid.to_csv(
+    os.path.join(folder, "valid_sales_data.csv"),
+    index=False
 )
 
-plt.xlabel("Product")
-plt.ylabel("Quantity")
-plt.tight_layout()
-plt.savefig("quantity_chart.png")
-plt.show()
+invalid.to_csv(
+    os.path.join(folder, "invalid_sales_data.csv"),
+    index=False
+)
 
-# SAVE VALID AND INVALID DATA
+print("\n=====================================")
+print("PROJECT COMPLETED SUCCESSFULLY!")
+print("=====================================")
 
-valid.to_csv("valid_sales_data.csv", index=False)
-invalid.to_csv("invalid_sales_data.csv", index=False)
+print("\nCSV FILES CREATED:")
+print("1. sales_summary.csv")
+print("2. product_analysis.csv")
+print("3. valid_sales_data.csv")
+print("4. invalid_sales_data.csv")
 
-print("\nPROJECT COMPLETED SUCCESSFULLY!")
+print("\nSAVED LOCATION:", folder)

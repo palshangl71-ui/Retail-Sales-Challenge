@@ -1,0 +1,19 @@
+OrderID,OrderDate,ProductName,Category,Region,Quantity,UnitPrice,UnitCost,Revenue
+ORD001,2026-11-01,Wireless Mouse,Accessories,North,2,750,450,1500
+ORD002,2026-11-01,Keyboard,Accessories,South,1,1200,700,1200
+ORD003,2026-11-02,Monitor,Electronics,West,1,8500,6500,8500
+ORD004,2026-11-02,USB Hub,Accessories,East,3,500,250,1500
+ORD005,2026-11-03,Laptop Stand,Accessories,North,2,900,500,1800
+ORD008,2026-11-04,Keyboard,Accessories,North,2,1200,700,2400
+ORD009,2026-11-05,Monitor,Electronics,West,1,8500,6500,8500
+ORD010,2026-11-05,Wireless Mouse,Accessories,South,2,750,450,1500
+ORD011,2026-11-06,USB Hub,Accessories,East,2,500,250,1000
+ORD012,2026-11-06,Laptop Stand,Accessories,North,1,900,500,900
+ORD013,2026-11-07,Headphones,Electronics,South,1,1800,1100,1800
+ORD014,2026-11-07,Webcam,Electronics,East,2,1200,800,2400
+ORD015,2026-11-08,Keyboard,Accessories,West,1,1200,700,1200
+ORD016,2026-11-08,Wireless Mouse,Accessories,North,1,750,450,750
+ORD017,2026-11-09,Monitor,Electronics,West,1,8500,6500,8500
+ORD018,2026-11-09,USB Hub,Accessories,South,2,500,250,1000
+ORD019,2026-11-10,Laptop Stand,Accessories,East,2,900,500,1800
+ORD020,2026-11-10,Headphones,Electronics,North,1,1800,1100,1800

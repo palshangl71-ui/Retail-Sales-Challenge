@@ -1,0 +1,3 @@
+OrderID,OrderDate,ProductName,Category,Region,Quantity,UnitPrice,UnitCost
+ORD006,2026-11-03,Headphones,Electronics,South,0,1800,1100
+ORD007,2026-11-04,Webcam,Electronics,East,1,-1200,800
