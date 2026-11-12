@@ -1,2 +1,2 @@
 # Retail-Sales-Challenge
-retails sales challenge - tyeam project
+retails sales challenge - team project
